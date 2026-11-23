@@ -341,15 +341,16 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 2;
+const APP_V = 3;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
-const DEF_CFG = { url: '', token: '', shop: 'ألبان الخير', cur: 'ج.م', cats: 'كهرباء,مياه,إيجار,نقل وبنزين,عمالة,أكياس وتغليف,ثلج وتبريد,صيانة,أخرى' };
+const DEF_CFG = { url: 'https://script.google.com/macros/s/AKfycbw4efrhRtNWOFwGBLu3L45vbSAvAsKuDH7z-6i34uytUy113YDZbkuJs0Ogr5wqP3At/exec', token: '', shop: 'ألبان الخير', cur: 'ج.م', cats: 'كهرباء,مياه,إيجار,نقل وبنزين,عمالة,أكياس وتغليف,ثلج وتبريد,صيانة,أخرى' };
 let cfg = Object.assign({}, DEF_CFG, LS.get('kh_cfg', {}));
+if (!cfg.url) cfg.url = DEF_CFG.url;
 const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
 const curMonth = () => today().slice(0, 7);
 const uid = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -724,7 +725,7 @@ function renderHome() {
   ].sort((a, b) => String(b[0].ts || b[0].id).localeCompare(a[0].ts || a[0].id));
   $('#todayCnt').textContent = all.length;
   $('#todayList').innerHTML = all.length ? all.map(([r, f]) => f(r)).join('') : '<div class="empty">لسه مفيش تسجيلات النهارده 📭</div>';
-  $('#setupWarn').innerHTML = cfg.url ? '' : '<div class="warn" onclick="openSettings()">⚠️ التطبيق لسه مش متوصل بشيت جوجل — دوس هنا وحط رابط السيرفر</div>';
+  $('#setupWarn').innerHTML = cfg.url && cfg.token ? '' : !cfg.token ? '<div class="warn" onclick="openSettings()">🔐 اكتب الرمز السري في الإعدادات عشان التسجيل يتحفظ في الشيت — دوس هنا</div>' : '<div class="warn" onclick="openSettings()">⚠️ التطبيق لسه مش متوصل بشيت جوجل — دوس هنا وحط رابط السيرفر</div>';
 }
 function renderPeople() {
   const arr = st[pType];
@@ -827,7 +828,7 @@ document.addEventListener('visibilitychange', () => {
   flush();
 });
 setDates(); renderAll(); renderCart(); updSync();
-if (cfg.url) reloadAll(); else setTimeout(openSettings, 400);
+if (cfg.url && cfg.token) reloadAll(); else setTimeout(openSettings, 400);
 
 /* ===== ⟳ التحديث ===== */
 (() => {
