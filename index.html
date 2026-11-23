@@ -341,7 +341,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 5;
+const APP_V = 6;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -628,7 +628,8 @@ function perStats(s, pid, per) {
 const perLbl = (per, m) => `<span dir="ltr" style="unicode-bidi:isolate">${per.a}–${per.b}/${+m.slice(5, 7)}</span>`;
 
 /* ===== تسجيل اليوم (زي جدول الإكسيل) ===== */
-const dgPeople = () => [...st.suppliers.map(p => [p, 'مورد']), ...st.farmers.map(p => [p, 'مزارع'])];
+const isActive = p => p.notes !== 'من الإكسيل' || st.data.intake.some(r => r.personId === p.id) || Math.abs((st.balances[p.id] || { due: 0, paid: 0 }).due - (st.balances[p.id] || { paid: 0 }).paid) > 0.01;
+const dgPeople = () => [...st.suppliers.filter(isActive).map(p => [p, 'مورد']), ...st.farmers.filter(isActive).map(p => [p, 'مزارع'])];
 const dgAll = (pid, d, prod) => st.data.intake.filter(r => r.personId === pid && r.date === d && (r.product || 'لبن خام') === prod);
 function dgExisting(pid, d, prod) { const a = dgAll(pid, d, prod); return a.length === 1 ? a[0] : null; }
 function renderDayGrid() {
@@ -728,8 +729,8 @@ function renderHome() {
   $('#setupWarn').innerHTML = cfg.url ? '' : '<div class="warn" onclick="openSettings()">⚠️ التطبيق لسه مش متوصل بشيت جوجل — دوس هنا وحط رابط السيرفر</div>';
 }
 function renderPeople() {
-  const arr = st[pType];
-  $('#peopleList').innerHTML = arr.length ? arr.map(p => {
+  const arr = st[pType].filter(isActive), old = st[pType].filter(p => !isActive(p));
+  $('#peopleList').innerHTML = (arr.length ? arr.map(p => {
     const mi = st.data.intake.filter(r => r.personId === p.id), mq = mi.reduce((s, r) => s + num(r.qty), 0), md = mi.reduce((s, r) => s + num(r.total), 0);
     const b = st.balances[p.id] || { due: 0, paid: 0 }, rem = b.due - b.paid;
     return `<div class="person"><div class="top"><b>${pType === 'suppliers' ? '🚚' : '👨‍🌾'} ${esc(p.name)}</b><small class="hint">${num(p.price) ? fmt(p.price) + ' للكيلو' : ''}</small></div>
@@ -740,7 +741,8 @@ function renderPeople() {
       <div class="acts"><button class="btn sm" onclick="openPay('${pType}','${esc(p.id)}','تقفيل حساب')">✅ تقفيل</button><button class="ib" onclick="openPay('${pType}','${esc(p.id)}','سلفة')">💸 سلفة</button>
       ${p.phone ? `<a class="btn sm sec" style="text-decoration:none" href="tel:${esc(p.phone)}">📞 اتصال</a>` : ''}
       <button class="ib" onclick="editPerson('${esc(p.id)}')">✏️ تعديل</button>${delBtn(pType, p.id)}</div></div>`;
-  }).join('') : `<div class="card empty">لسه مفيش ${pType === 'suppliers' ? 'موردين' : 'مزارعين'} — ضيف من تحت 👇</div>`;
+  }).join('') : `<div class="card empty">لسه مفيش ${pType === 'suppliers' ? 'موردين' : 'مزارعين'} — ضيف من تحت 👇</div>`)
+    + (old.length ? `<details class="cur"><summary>🗂️ موردين قدام (مش بيورّدوا الشهر ده) <span class="cnt">${old.length}</span></summary><div class="in">${old.map(p => `<div class="item"><div class="t"><b>${esc(p.name)}</b><small>${fmt(p.price)} للكيلو</small></div><button class="ib" onclick="editPerson('${esc(p.id)}')">✏️</button></div>`).join('')}</div></details>` : '');
   $('#payCnt').textContent = st.data.payments.length;
   $('#payList').innerHTML = groupByDate(st.data.payments, payRow);
 }
