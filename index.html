@@ -114,6 +114,12 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .hint{font-size:12px;color:var(--mut);line-height:1.7}
 .badge{font-size:11px;padding:1px 8px;border-radius:20px;font-weight:800}
 .b-f{background:#14532d;color:#86efac}.b-s{background:#1e3a8a;color:#93c5fd}
+.per{background:var(--card);border-radius:10px;padding:8px;margin:8px 0;font-size:12.5px}
+.per b{color:var(--acc2)}
+.qrow{display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.qrow input{text-align:center;font-size:17px;font-weight:800;padding:8px}
+.qrow small{color:var(--mut);font-size:11px;display:block}
+.qrow.done input{border-color:var(--acc)}
 .warn{background:#422006;border:1px solid #a16207;color:#fde68a;border-radius:12px;padding:10px;font-size:13px;font-weight:700;margin-bottom:12px}
 #updCard{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:70;max-width:420px;margin:auto;background:#050f08;border:1px solid #a3e63599;border-radius:16px;padding:14px;box-shadow:0 8px 30px #000c;display:none}
 #updCard.on{display:block}
@@ -196,7 +202,17 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
   <!-- ===== الوارد ===== -->
   <section class="tab" id="t-intake">
     <div class="card">
-      <h2>🥛 تسجيل وارد</h2>
+      <h2>📝 تسجيل اليوم</h2>
+      <div class="grid">
+        <div><label>التاريخ</label><input type="date" id="dg_date" onchange="renderDayGrid()"></div>
+        <div><label>الصنف</label><select id="dg_product"></select></div>
+      </div>
+      <div class="hint" style="margin:8px 0 2px">✍️ اكتب كيلو كل مورد النهارده، والفاضي بيتساب</div>
+      <div id="dayGrid"></div>
+      <div class="total" style="margin-top:8px"><span>إجمالي اليوم</span><span id="dg_total">0</span></div>
+      <button class="btn" onclick="saveDayGrid()">💾 حفظ اليوم</button>
+    </div>
+    <details class="cur"><summary>🥛 تسجيل وارد مفصّل</summary><div class="in">
       <div class="grid">
         <div><label>التاريخ</label><input type="date" id="in_date"></div>
         <div><label>الوردية</label><select id="in_shift"><option>صباحي</option><option>مسائي</option></select></div>
@@ -212,7 +228,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
         <div class="full"><label>ملاحظات</label><input id="in_notes" placeholder="اختياري"></div>
         <div class="full"><button class="btn" onclick="saveIntake()">💾 حفظ</button></div>
       </div>
-    </div>
+    </div></details>
     <details class="cur"><summary>📅 وارد الشهر <span class="cnt" id="intakeCnt">0</span></summary><div class="in">
       <div class="fbar"><input placeholder="🔎 دوّر" oninput="setF('intake','q',this.value)"><input type="date" onchange="setF('intake','d',this.value)"></div>
       <div id="intakeList"></div></div></details>
@@ -269,7 +285,8 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
         <div class="full"><label>الاسم</label><input id="p_name"></div>
         <div><label>التليفون</label><input type="tel" id="p_phone"></div>
         <div><label>سعر الكيلو</label><input type="number" inputmode="decimal" id="p_price"></div>
-        <div class="full"><label>ملاحظات</label><input id="p_notes" placeholder="مثلاً: بيورّد جبنة قريش"></div>
+        <div class="full"><label>طريقة الحساب</label><select id="p_cycle"><option>أسبوعي</option><option>نص شهري</option><option selected>شهري</option></select></div>
+        <div class="full"><label>ملاحظات</label><input id="p_notes" placeholder="اختياري"></div>
         <div class="full"><button class="btn" id="p_btn" onclick="savePerson()">💾 إضافة</button></div>
         <div class="full" id="p_cancel" style="display:none"><button class="btn sec" onclick="resetPerson()">إلغاء التعديل</button></div>
       </div></div></details>
@@ -283,7 +300,8 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
     <details class="cur" open><summary>📆 الملخص اليومي</summary><div class="in tbl" id="sumDaily"></div></details>
     <details class="cur"><summary>🧀 المبيعات حسب المنتج</summary><div class="in" id="sumProducts"></div></details>
     <details class="cur"><summary>🧾 المصاريف حسب البند</summary><div class="in" id="sumExp"></div></details>
-    <details class="cur"><summary>🚚 حساب الموردين والمزارعين</summary><div class="in tbl" id="sumPeople"></div></details>
+    <details class="cur" open><summary>📒 كشف حساب الموردين</summary><div class="in tbl" id="sumPeople"></div></details>
+    <details class="cur"><summary>📅 حساب الفترات (أسبوعي / نص شهري)</summary><div class="in" id="sumPeriods"></div></details>
   </section>
 </main>
 
@@ -323,7 +341,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 1;
+const APP_V = 2;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -364,6 +382,7 @@ async function api(action, payload = {}) {
 }
 const LISTS = ['products', 'suppliers', 'farmers'];
 function applyOp(s, op) {
+  if (op.action === 'addMany') { op.payload.records.forEach(record => applyOp(s, { action: 'add', payload: { sheet: op.payload.sheet, record } })); return; }
   const p = op.payload, isL = LISTS.includes(p.sheet);
   const arr = isL ? s[p.sheet] : s.data[p.sheet];
   if (!arr) return;
@@ -567,27 +586,77 @@ function savePerson() {
   const name = $('#p_name').value.trim();
   if (!name) return toast('⚠️ اكتب الاسم');
   const id = $('#p_id').value;
-  doOp(id ? 'update' : 'add', { sheet: pType, record: { id: id || uid(), name, phone: $('#p_phone').value.trim(), price: num($('#p_price').value), notes: $('#p_notes').value.trim() } });
+  doOp(id ? 'update' : 'add', { sheet: pType, record: { id: id || uid(), name, phone: $('#p_phone').value.trim(), price: num($('#p_price').value), cycle: $('#p_cycle').value, notes: $('#p_notes').value.trim() } });
   toast(id ? '✅ اتعدل' : '✅ اتضاف ' + name); resetPerson(); fillPersonSelect();
 }
 function editPerson(id) {
   const p = st[pType].find(x => x.id === id); if (!p) return;
-  $('#p_id').value = p.id; $('#p_name').value = p.name; $('#p_phone').value = p.phone || ''; $('#p_price').value = p.price || ''; $('#p_notes').value = p.notes || '';
+  $('#p_id').value = p.id; $('#p_name').value = p.name; $('#p_phone').value = p.phone || ''; $('#p_price').value = p.price || ''; $('#p_cycle').value = p.cycle || 'شهري'; $('#p_notes').value = p.notes || '';
   $('#p_btn').textContent = '💾 حفظ التعديل'; $('#p_cancel').style.display = ''; $('#pFormTitle').textContent = '✏️ تعديل ' + p.name;
   $('#pForm').open = true; $('#pForm').scrollIntoView({ behavior: 'smooth' });
 }
 function resetPerson() {
-  ['p_id', 'p_name', 'p_phone', 'p_price', 'p_notes'].forEach(i => $('#' + i).value = '');
+  ['p_id', 'p_name', 'p_phone', 'p_price', 'p_notes'].forEach(i => $('#' + i).value = ''); $('#p_cycle').value = 'شهري';
   $('#p_btn').textContent = '💾 إضافة'; $('#p_cancel').style.display = 'none'; $('#pFormTitle').textContent = '➕ إضافة ' + PERSON[pType];
 }
-function openPay(type, id) {
+function openPay(type, id, ptype) {
   const p = st[type].find(x => x.id === id); if (!p) return;
   const b = st.balances[id] || { due: 0, paid: 0 }, rem = Math.max(0, Math.round((b.due - b.paid) * 100) / 100);
-  openForm('💵 دفع لـ ' + p.name + ' — المتبقي ' + money(b.due - b.paid), [['date', 'التاريخ', 'date'], ['amount', 'المبلغ', 'num'], ['notes', 'ملاحظات', 'text']], { date: today(), amount: rem || '', notes: '' }, v => {
+  const adv = ptype === 'سلفة';
+  openForm((adv ? '💸 سلفة لـ ' : '✅ تقفيل حساب ') + p.name + ' — المتبقي له ' + money(b.due - b.paid), [['date', 'التاريخ', 'date'], ['ptype', 'نوع الدفع', 'sel', ['سلفة', 'تقفيل حساب']], ['amount', 'المبلغ', 'num'], ['notes', 'ملاحظات', 'text']], { date: today(), ptype, amount: adv ? '' : rem || '', notes: '' }, v => {
     if (!num(v.amount)) return toast('⚠️ اكتب المبلغ');
-    doOp('add', { sheet: 'payments', record: { id: uid(), date: v.date || today(), kind: PERSON[type], personId: p.id, name: p.name, amount: num(v.amount), notes: v.notes } });
-    toast('✅ اتسجل دفع ' + money(v.amount)); return true;
+    doOp('add', { sheet: 'payments', record: { id: uid(), date: v.date || today(), kind: PERSON[type], personId: p.id, name: p.name, amount: num(v.amount), ptype: v.ptype, notes: v.notes } });
+    toast('✅ اتسجل ' + v.ptype + ' ' + money(v.amount)); return true;
   });
+}
+
+/* ===== فترات الحساب (أسبوعي: 1-7 / 8-15 / 16-23 / 24-آخر الشهر — نص شهري: 1-15 / 16-آخر — شهري) ===== */
+const dim = m => new Date(+m.slice(0, 4), +m.slice(5, 7), 0).getDate();
+function periods(cycle, m) {
+  const n = dim(m);
+  const P = cycle === 'أسبوعي' ? [[1, 7], [8, 15], [16, 23], [24, n]] : cycle === 'نص شهري' ? [[1, 15], [16, n]] : [[1, n]];
+  return P.map(([a, b]) => ({ a, b, from: m + '-' + String(a).padStart(2, '0'), to: m + '-' + String(b).padStart(2, '0') }));
+}
+function perStats(s, pid, per) {
+  const inP = r => r.personId === pid && r.date >= per.from && r.date <= per.to;
+  const q = s.data.intake.filter(inP), py = s.data.payments.filter(inP);
+  const o = { kg: q.reduce((x, r) => x + num(r.qty), 0), amt: q.reduce((x, r) => x + num(r.total), 0),
+    adv: py.filter(r => r.ptype === 'سلفة').reduce((x, r) => x + num(r.amount), 0), set: py.filter(r => r.ptype !== 'سلفة').reduce((x, r) => x + num(r.amount), 0) };
+  o.net = o.amt - o.adv - o.set; return o;
+}
+const perLbl = (per, m) => `<span dir="ltr" style="unicode-bidi:isolate">${per.a}–${per.b}/${+m.slice(5, 7)}</span>`;
+
+/* ===== تسجيل اليوم (زي جدول الإكسيل) ===== */
+const dgPeople = () => [...st.suppliers.map(p => [p, 'مورد']), ...st.farmers.map(p => [p, 'مزارع'])];
+const dgAll = (pid, d, prod) => st.data.intake.filter(r => r.personId === pid && r.date === d && (r.product || 'لبن خام') === prod);
+function dgExisting(pid, d, prod) { const a = dgAll(pid, d, prod); return a.length === 1 ? a[0] : null; }
+function renderDayGrid() {
+  const d = $('#dg_date').value || today(), prod = $('#dg_product').value || 'لبن خام', ppl = dgPeople();
+  $('#dayGrid').innerHTML = ppl.length ? ppl.map(([p, k]) => { const all = dgAll(p.id, d, prod), ex = all.length === 1 ? all[0] : null;
+    if (all.length > 1) return `<div class="qrow done"><div><b>${esc(p.name)}</b><small>✅ متسجل ${all.length} مرات — عدّل من «وارد الشهر»</small></div><input disabled value="${fmt(all.reduce((x, r) => x + num(r.qty), 0))}"></div>`;
+    return `<div class="qrow ${ex ? 'done' : ''}"><div><b>${esc(p.name)}</b> ${k === 'مزارع' ? tag(k) : ''}<small>${num(p.price) ? fmt(p.price) + ' ' + cfg.cur + ' للكيلو' : '⚠️ من غير سعر'}${ex ? ' · ✅ متسجل' : ''}</small></div>
+      <input type="number" inputmode="decimal" data-pid="${esc(p.id)}" value="${ex ? ex.qty : ''}" placeholder="كيلو" oninput="dgSum()"></div>`; }).join('')
+    : '<div class="empty">ضيف الموردين الأول من قسم الموردين 🚚</div>';
+  dgSum();
+}
+function dgSum() { let t = 0; document.querySelectorAll('#dayGrid input').forEach(i => t += num(i.value)); $('#dg_total').textContent = kg(t); }
+function saveDayGrid() {
+  const d = $('#dg_date').value || today(), prod = $('#dg_product').value || 'لبن خام', adds = [];
+  let n = 0;
+  document.querySelectorAll('#dayGrid input:not([disabled])').forEach(i => {
+    const pid = i.dataset.pid, qty = num(i.value), ex = dgExisting(pid, d, prod);
+    const pk = st.suppliers.find(x => x.id === pid) ? ['مورد', st.suppliers.find(x => x.id === pid)] : ['مزارع', st.farmers.find(x => x.id === pid)];
+    const p = pk[1]; if (!p) return;
+    if (ex) {
+      if (!qty) { doOp('delete', { sheet: 'intake', id: ex.id }); n++; }
+      else if (qty !== num(ex.qty)) { doOp('update', { sheet: 'intake', record: Object.assign({}, ex, { qty, total: qty * num(ex.price) }) }); n++; }
+    } else if (qty) {
+      adds.push({ id: uid(), date: d, shift: 'صباحي', kind: pk[0], personId: p.id, name: p.name, product: prod, qty, price: num(p.price), total: qty * num(p.price), notes: '' });
+    }
+  });
+  if (adds.length) doOp('addMany', { sheet: 'intake', records: adds });
+  n += adds.length;
+  toast(n ? '✅ اتحفظ اليوم (' + n + ')' : 'مفيش تغيير');
 }
 
 /* ===== التعديل ===== */
@@ -596,7 +665,7 @@ const SCHEMA = () => ({
   sales: [['date', 'التاريخ', 'date'], ['product', 'المنتج', 'sel', st.products.map(p => p.name)], ['size', 'الحجم', 'sel', Object.keys(SIZE)], ['count', 'العدد', 'num'], ['price', 'السعر', 'num'], ['customer', 'العميل', 'text'], ['pay', 'الدفع', 'sel', ['كاش', 'آجل', 'تحويل']]],
   expenses: [['date', 'التاريخ', 'date'], ['category', 'البند', 'sel', list(cfg.cats)], ['amount', 'المبلغ', 'num'], ['notes', 'ملاحظات', 'text']],
   losses: [['date', 'التاريخ', 'date'], ['reason', 'السبب', 'text'], ['qty', 'الكمية (كيلو)', 'num'], ['value', 'القيمة', 'num'], ['notes', 'ملاحظات', 'text']],
-  payments: [['date', 'التاريخ', 'date'], ['amount', 'المبلغ', 'num'], ['notes', 'ملاحظات', 'text']]
+  payments: [['date', 'التاريخ', 'date'], ['ptype', 'نوع الدفع', 'sel', ['سلفة', 'تقفيل حساب']], ['amount', 'المبلغ', 'num'], ['notes', 'ملاحظات', 'text']]
 });
 function openForm(title, fields, vals, onSave) {
   $('#edTitle').textContent = title;
@@ -634,7 +703,7 @@ const inRow = r => `<div class="item"><div class="t"><b>${r.shift === 'مسائ�
 const saRow = r => `<div class="item"><div class="t"><b>${esc(r.product)} <small>${r.count} × ${esc(r.size)}</small></b><small>${fmt(r.price)} · ${esc(r.pay)}${r.customer ? ' · ' + esc(r.customer) : ''}${r.invoice ? ' · ' + esc(r.invoice) : ''}</small></div><span class="v">${money(r.total)}</span>${acts('sales', r.id)}</div>`;
 const exRow = r => `<div class="item"><div class="t"><b>${esc(r.category)}</b><small>${esc(r.notes) || '—'}</small></div><span class="v">${money(r.amount)}</span>${acts('expenses', r.id)}</div>`;
 const loRow = r => `<div class="item"><div class="t"><b>⚠️ ${esc(r.reason)}</b><small>${kg(r.qty)}${r.notes ? ' · ' + esc(r.notes) : ''}</small></div><span class="v">${money(r.value)}</span>${acts('losses', r.id)}</div>`;
-const payRow = r => `<div class="item"><div class="t"><b>💵 ${esc(r.name)} ${tag(r.kind)}</b><small>${esc(r.notes) || '—'}</small></div><span class="v">${money(r.amount)}</span>${acts('payments', r.id)}</div>`;
+const payRow = r => `<div class="item"><div class="t"><b>${r.ptype === 'سلفة' ? '💸 سلفة' : '✅ تقفيل'} · ${esc(r.name)} ${tag(r.kind)}</b><small>${esc(r.notes) || '—'}</small></div><span class="v">${money(r.amount)}</span>${acts('payments', r.id)}</div>`;
 
 function totals(d, f = () => true) {
   const s = (a, k) => a.filter(f).reduce((x, r) => x + num(r[k]), 0);
@@ -665,7 +734,9 @@ function renderPeople() {
     return `<div class="person"><div class="top"><b>${pType === 'suppliers' ? '🚚' : '👨‍🌾'} ${esc(p.name)}</b><small class="hint">${num(p.price) ? fmt(p.price) + ' للكيلو' : ''}</small></div>
       ${p.notes ? `<div class="hint">${esc(p.notes)}</div>` : ''}
       <div class="stats"><div><span>كيلو الشهر</span><strong>${fmt(mq)}</strong></div><div><span>حساب الشهر</span><strong>${fmt(md)}</strong></div><div><span>المتبقي له</span><strong class="${rem > 0 ? 'neg' : 'pos'}">${fmt(rem)}</strong></div></div>
-      <div class="acts"><button class="btn sm" onclick="openPay('${pType}','${esc(p.id)}')">💵 دفع</button>
+      ${(() => { const cy = p.cycle || 'شهري', per = periods(cy, st.month).find(x => today() >= x.from && today() <= x.to) || periods(cy, st.month)[0], o = perStats(st, p.id, per);
+        return `<div class="per">📅 حساب <b>${cy}</b> — الفترة <b>${perLbl(per, st.month)}</b>: ${fmt(o.kg)} كيلو = ${fmt(o.amt)}${o.adv ? ` · سلف <b style="color:var(--red)">${fmt(o.adv)}</b>` : ''}${o.set ? ` · اتصرف ${fmt(o.set)}` : ''} · الصافي <b>${fmt(o.net)}</b></div>`; })()}
+      <div class="acts"><button class="btn sm" onclick="openPay('${pType}','${esc(p.id)}','تقفيل حساب')">✅ تقفيل</button><button class="ib" onclick="openPay('${pType}','${esc(p.id)}','سلفة')">💸 سلفة</button>
       ${p.phone ? `<a class="btn sm sec" style="text-decoration:none" href="tel:${esc(p.phone)}">📞 اتصال</a>` : ''}
       <button class="ib" onclick="editPerson('${esc(p.id)}')">✏️ تعديل</button>${delBtn(pType, p.id)}</div></div>`;
   }).join('') : `<div class="card empty">لسه مفيش ${pType === 'suppliers' ? 'موردين' : 'مزارعين'} — ضيف من تحت 👇</div>`;
@@ -684,6 +755,7 @@ function fillSelects() {
   $('#ex_cat').innerHTML = list(cfg.cats).map(x => `<option>${esc(x)}</option>`).join('');
   $('#in_product').innerHTML = inProducts().map(x => `<option>${esc(x)}</option>`).join('');
   $('#lo_product').innerHTML = inProducts().map(x => `<option>${esc(x)}</option>`).join('');
+  const kd = $('#dg_product').value; $('#dg_product').innerHTML = inProducts().map(x => `<option>${esc(x)}</option>`).join(''); if (kd) $('#dg_product').value = kd;
   if (keep.c) $('#ex_cat').value = keep.c; if (keep.p) $('#in_product').value = keep.p; if (keep.l) $('#lo_product').value = keep.l;
   $('#shopName').textContent = cfg.shop; document.title = cfg.shop;
 }
@@ -691,6 +763,7 @@ function renderAll() {
   if (selProd) selProd = st.products.find(p => p.id === selProd.id) || null;
   fillSelects(); fillPersonSelect(); renderProdGrid(); renderProdList();
   renderHome(); renderLists(); renderPeople();
+  if (!document.activeElement || !document.activeElement.closest('#dayGrid')) renderDayGrid();
   if (sumSt && $('#t-sum').classList.contains('on')) renderSum();
 }
 
@@ -720,9 +793,15 @@ function renderSum() {
   const ee = Object.entries(ex).sort((a, b) => b[1] - a[1]);
   $('#sumExp').innerHTML = ee.length ? ee.map(([k, v]) => `<div class="item"><div class="t"><b>${esc(k)}</b><div style="height:6px;background:var(--card2);border-radius:6px;margin-top:4px"><div style="height:6px;border-radius:6px;background:var(--amb);width:${t.exp ? v / t.exp * 100 : 0}%"></div></div></div><span class="v">${money(v)}</span></div>`).join('') : '<div class="empty">مفيش 📭</div>';
   const people = [...sumSt.suppliers.map(p => [p, 'مورد']), ...sumSt.farmers.map(p => [p, 'مزارع'])];
-  $('#sumPeople').innerHTML = people.length ? `<table><tr><th>الاسم</th><th>كيلو</th><th>حساب الشهر</th><th>مدفوع الشهر</th><th>المتبقي الكلي</th></tr>` +
-    people.map(([p, k]) => { const q = d.intake.filter(r => r.personId === p.id), pd = d.payments.filter(r => r.personId === p.id), b = sumSt.balances[p.id] || { due: 0, paid: 0 }, rem = b.due - b.paid;
-      return `<tr><td>${esc(p.name)}<br>${tag(k)}</td><td>${fmt(q.reduce((s, r) => s + num(r.qty), 0))}</td><td>${fmt(q.reduce((s, r) => s + num(r.total), 0))}</td><td>${fmt(pd.reduce((s, r) => s + num(r.amount), 0))}</td><td class="${rem > 0 ? 'neg' : 'pos'}">${fmt(rem)}</td></tr>`; }).join('') + '</table>' : '<div class="empty">مفيش أسماء 📭</div>';
+  const T = { kg: 0, amt: 0, adv: 0, set: 0, net: 0 };
+  $('#sumPeople').innerHTML = people.length ? `<table><tr><th>الاسم</th><th>المجموع كيلو</th><th>السعر</th><th>الحساب</th><th>من الحساب (سلف)</th><th>اتصرف</th><th>الصافي</th></tr>` +
+    people.map(([p, k]) => { const o = perStats(sumSt, p.id, { from: sumSt.month + '-01', to: sumSt.month + '-31' }); Object.keys(T).forEach(x => T[x] += o[x]);
+      return `<tr><td>${esc(p.name)}<br><small class="hint">${esc(p.cycle || 'شهري')}</small></td><td>${fmt(o.kg)}</td><td>${fmt(p.price)}</td><td>${fmt(o.amt)}</td><td class="${o.adv ? 'neg' : ''}">${fmt(o.adv)}</td><td>${fmt(o.set)}</td><td class="${o.net > 0 ? 'neg' : 'pos'}">${fmt(o.net)}</td></tr>`; }).join('') +
+    `<tr style="font-weight:800"><td>الإجمالي</td><td>${fmt(T.kg)}</td><td></td><td>${fmt(T.amt)}</td><td>${fmt(T.adv)}</td><td>${fmt(T.set)}</td><td>${fmt(T.net)}</td></tr></table><div class="hint" style="margin-top:6px">ℹ️ الصافي = الحساب − السلف − اللي اتصرف في الشهر. الأحمر = لسه ليه فلوس.</div>` : '<div class="empty">مفيش أسماء 📭</div>';
+  const pp = people.filter(([p]) => (p.cycle || 'شهري') !== 'شهري');
+  $('#sumPeriods').innerHTML = pp.length ? pp.map(([p]) => `<div class="person"><div class="top"><b>${esc(p.name)}</b><small class="hint">${esc(p.cycle)} · ${fmt(p.price)} للكيلو</small></div><div class="tbl"><table><tr><th>الفترة</th><th>الكمية</th><th>المبلغ</th><th>سلف</th><th>الصافي</th></tr>` +
+    periods(p.cycle, sumSt.month).map(per => { const o = perStats(sumSt, p.id, per); return `<tr><td>${perLbl(per, sumSt.month)}</td><td>${fmt(o.kg)}</td><td>${fmt(o.amt)}</td><td>${fmt(o.adv)}</td><td class="${o.net > 0 ? 'neg' : 'pos'}">${fmt(o.net)}</td></tr>`; }).join('') + '</table></div></div>').join('')
+    : '<div class="empty">كل الموردين حسابهم شهري 📭</div>';
 }
 
 /* ===== الإعدادات ===== */
@@ -739,7 +818,7 @@ async function testConn() {
 }
 
 /* ===== تشغيل ===== */
-function setDates() { ['in_date', 'sa_date', 'ex_date', 'lo_date'].forEach(i => $('#' + i).value = today()); $('#sumMonth').value = curMonth(); }
+function setDates() { ['dg_date', 'in_date', 'sa_date', 'ex_date', 'lo_date'].forEach(i => $('#' + i).value = today()); $('#sumMonth').value = curMonth(); }
 let lastDay = today();
 window.addEventListener('online', () => { toast('🌐 النت رجع — بيبعت التسجيلات'); flush(); });
 document.addEventListener('visibilitychange', () => {
