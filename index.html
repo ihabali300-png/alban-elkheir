@@ -320,7 +320,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
     <h2>⚙️ الإعدادات</h2>
     <div class="grid">
       <div class="full"><label>رابط السيرفر (Web App URL)</label><input id="s_url" placeholder="https://script.google.com/macros/s/.../exec" dir="ltr"></div>
-      <div class="full"><label>الرمز السري</label><input id="s_token" dir="ltr"></div>
+      <div class="full" style="display:none"><label>الرمز السري</label><input id="s_token" dir="ltr"></div>
       <div><label>اسم المحل</label><input id="s_shop"></div>
       <div><label>العملة</label><input id="s_cur"></div>
       <div class="full"><label>بنود المصاريف (افصل بفاصلة)</label><textarea id="s_cats" rows="2"></textarea></div>
@@ -341,7 +341,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 3;
+const APP_V = 4;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -725,7 +725,7 @@ function renderHome() {
   ].sort((a, b) => String(b[0].ts || b[0].id).localeCompare(a[0].ts || a[0].id));
   $('#todayCnt').textContent = all.length;
   $('#todayList').innerHTML = all.length ? all.map(([r, f]) => f(r)).join('') : '<div class="empty">لسه مفيش تسجيلات النهارده 📭</div>';
-  $('#setupWarn').innerHTML = cfg.url && cfg.token ? '' : !cfg.token ? '<div class="warn" onclick="openSettings()">🔐 اكتب الرمز السري في الإعدادات عشان التسجيل يتحفظ في الشيت — دوس هنا</div>' : '<div class="warn" onclick="openSettings()">⚠️ التطبيق لسه مش متوصل بشيت جوجل — دوس هنا وحط رابط السيرفر</div>';
+  $('#setupWarn').innerHTML = cfg.url ? '' : '<div class="warn" onclick="openSettings()">⚠️ التطبيق لسه مش متوصل بشيت جوجل — دوس هنا وحط رابط السيرفر</div>';
 }
 function renderPeople() {
   const arr = st[pType];
@@ -828,7 +828,7 @@ document.addEventListener('visibilitychange', () => {
   flush();
 });
 setDates(); renderAll(); renderCart(); updSync();
-if (cfg.url && cfg.token) reloadAll(); else setTimeout(openSettings, 400);
+if (cfg.url) reloadAll(); else setTimeout(openSettings, 400);
 
 /* ===== ⟳ التحديث ===== */
 (() => {
