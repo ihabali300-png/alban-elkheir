@@ -1,0 +1,24 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.ihab.albankheir'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.ihab.albankheir'
+        minSdk 24
+        targetSdk 34
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
+        versionName "1.0." + (System.getenv('GITHUB_RUN_NUMBER') ?: '1')
+        resValue 'string', 'app_name', 'ألبان الخير'
+    }
+    signingConfigs {
+        release {
+            storeFile file('kheir-release.jks')
+            storePassword 'kheir-app-2026'
+            keyAlias 'kheir'
+            keyPassword 'kheir-app-2026'
+        }
+    }
+    buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+dependencies { implementation 'androidx.core:core:1.13.1' }
