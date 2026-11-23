@@ -341,7 +341,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 4;
+const APP_V = 5;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -822,6 +822,7 @@ async function testConn() {
 function setDates() { ['dg_date', 'in_date', 'sa_date', 'ex_date', 'lo_date'].forEach(i => $('#' + i).value = today()); $('#sumMonth').value = curMonth(); }
 let lastDay = today();
 window.addEventListener('online', () => { toast('🌐 النت رجع — بيبعت التسجيلات'); flush(); });
+setInterval(() => { if (queue.length && navigator.onLine !== false) flush(); }, 20000);   // محاولة تلقائية كل 20 ثانية
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (lastDay !== today()) { lastDay = today(); setDates(); if (st.month !== curMonth()) reloadAll(); else renderHome(); }
