@@ -113,7 +113,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 #toast.on{opacity:1;transform:translateX(-50%)}
 .hint{font-size:12px;color:var(--mut);line-height:1.7}
 .badge{font-size:11px;padding:1px 8px;border-radius:20px;font-weight:800}
-.b-f{background:#14532d;color:#86efac}.b-s{background:#1e3a8a;color:#93c5fd}
+.b-c{background:var(--sel);color:var(--acc)}.b-f{background:#14532d;color:#86efac}.b-s{background:#1e3a8a;color:#93c5fd}
 .per{background:var(--card);border-radius:10px;padding:8px;margin:8px 0;font-size:12.5px}
 .per b{color:var(--acc2)}
 .qrow{display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--bd)}
@@ -134,6 +134,9 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .spill{margin-inline-start:auto;font-size:12px;font-weight:800;color:var(--txt);background:var(--sel);border:1px solid var(--selb);border-radius:12px;padding:4px 9px;line-height:1.5;text-align:center}
 .spill b{color:var(--acc);font-size:15px}
 .spill.low b{color:var(--amb)}.spill.out b{color:var(--red)}
+.cbtn{border:1px dashed var(--acc);background:var(--in);color:var(--acc);border-radius:10px;padding:6px 10px;font-family:inherit;font-weight:800;font-size:13px;display:inline-block}
+.cbtn.done{border-style:solid;color:var(--acc2)}
+.cplus{border:0;background:var(--acc);color:var(--onacc);border-radius:8px;padding:1px 6px;font-family:inherit;font-weight:800;font-size:12px;margin-inline-start:4px}
 .warn{background:#422006;border:1px solid #a16207;color:#fde68a;border-radius:12px;padding:10px;font-size:13px;font-weight:700;margin-bottom:12px}
 #updCard{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:70;max-width:420px;margin:auto;background:var(--bg);border:1px solid #a3e63599;border-radius:16px;padding:14px;box-shadow:0 8px 30px #000c;display:none}
 #updCard.on{display:block}
@@ -384,7 +387,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 9;
+const APP_V = 10;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -610,6 +613,12 @@ function saveIntake() {
   toast('✅ اتسجل ' + kg(qty) + ' من ' + p.name);
 }
 
+function carryOver(q) {
+  if (!q) return;
+  doOp('add', { sheet: 'intake', record: { id: uid(), date: today(), shift: 'صباحي', kind: 'مرحّل', personId: '', name: 'باقي امبارح', product: 'لبن خام', qty: q, price: 0, total: 0, notes: 'مرحّل من امبارح' } });
+  toast('✅ اترحّل ' + fmt(q) + ' كيلو من امبارح');
+}
+
 /* ===== المصاريف والخسارة ===== */
 function saveExp() {
   const amount = num($('#ex_amount').value);
@@ -742,7 +751,7 @@ function groupByDate(arr, rowFn) {
   arr.slice().sort((a, b) => String(b.date).localeCompare(a.date) || String(b.ts || b.id).localeCompare(a.ts || a.id)).forEach(r => (g[r.date] = g[r.date] || []).push(r));
   return Object.keys(g).map(d => `<span class="day">${dayName(d)} ${d}</span>` + g[d].map(rowFn).join('')).join('');
 }
-const tag = k => `<span class="badge ${k === 'مورد' ? 'b-s' : 'b-f'}">${esc(k)}</span>`;
+const tag = k => `<span class="badge ${k === 'مورد' ? 'b-s' : k === 'مرحّل' ? 'b-c' : 'b-f'}">${esc(k)}</span>`;
 const acts = (s, id) => edBtn(s, id) + delBtn(s, id);
 const inRow = r => `<div class="item"><div class="t"><b>${r.shift === 'مسائي' ? '🌙' : '🌅'} ${esc(r.name)} ${tag(r.kind)}</b><small>${esc(r.product || '')} · ${kg(r.qty)} × ${fmt(r.price)}${r.notes ? ' · ' + esc(r.notes) : ''}</small></div><span class="v">${money(r.total)}</span>${acts('intake', r.id)}</div>`;
 const saRow = r => `<div class="item"><div class="t"><b>${esc(r.product)} <small>${r.count} × ${esc(r.size)}</small></b><small>${fmt(r.price)} · ${esc(r.pay)}${r.customer ? ' · ' + esc(r.customer) : ''}${r.invoice ? ' · ' + esc(r.invoice) : ''}</small></div><span class="v">${money(r.total)}</span>${acts('sales', r.id)}</div>`;
@@ -752,7 +761,8 @@ const payRow = r => `<div class="item"><div class="t"><b>${r.ptype === 'سلفة
 
 function totals(d, f = () => true) {
   const s = (a, k) => a.filter(f).reduce((x, r) => x + num(r[k]), 0);
-  const t = { inQty: s(d.intake, 'qty'), inCost: s(d.intake, 'total'), sales: s(d.sales, 'total'), soldKg: s(d.sales, 'qty'), exp: s(d.expenses, 'amount'), lossQty: s(d.losses, 'qty'), lossVal: s(d.losses, 'value'), paid: s(d.payments, 'amount') };
+  const CK = r => r.kind === 'مرحّل';
+  const t = { carry: d.intake.filter(f).filter(CK).reduce((x, r) => x + num(r.qty), 0), inQty: d.intake.filter(f).filter(r => !CK(r)).reduce((x, r) => x + num(r.qty), 0), inCost: s(d.intake, 'total'), sales: s(d.sales, 'total'), soldKg: s(d.sales, 'qty'), exp: s(d.expenses, 'amount'), lossQty: s(d.losses, 'qty'), lossVal: s(d.losses, 'value'), paid: s(d.payments, 'amount') };
   t.profit = t.sales - t.inCost - t.exp; return t;
 }
 const kpi = (l, v, c = '') => `<div class="kpi ${c}"><span>${l}</span><strong>${v}</strong></div>`;
@@ -760,13 +770,17 @@ const kpi = (l, v, c = '') => `<div class="kpi ${c}"><span>${l}</span><strong>${
 function renderHome() {
   const td = today(), t = totals(st.data, r => r.date === td);
   $('#todayLbl').textContent = dayName(td) + ' ' + td;
-  const left = t.inQty - t.soldKg - t.lossQty, pctL = t.inQty ? Math.max(0, Math.min(100, left / t.inQty * 100)) : 0;
-  const sp = $('#salePill'); sp.className = 'spill' + (t.inQty && left <= 0 ? ' out' : t.inQty && pctL < 20 ? ' low' : '');
-  sp.innerHTML = `🥛 وارد ${fmt(t.inQty)} · باقي <b>${fmt(left)}</b> كيلو`;
-  const sc = $('#stockCard'); sc.className = 'stock' + (t.inQty && left <= 0 ? ' out' : t.inQty && pctL < 20 ? ' low' : '');
-  sc.innerHTML = `<div class="top"><div><span>🥛 المتبقي من وارد النهارده</span><strong>${fmt(left)} <small>كيلو</small></strong></div><div style="text-align:left"><span>الوارد</span><strong style="font-size:20px">${fmt(t.inQty)} <small>كيلو</small></strong></div></div>
+  const avail = t.inQty + t.carry, left = avail - t.soldKg - t.lossQty, pctL = avail ? Math.max(0, Math.min(100, left / avail * 100)) : 0;
+  const yd = (() => { const x = new Date(td + 'T12:00'); x.setDate(x.getDate() - 1); return x.toISOString().slice(0, 10); })();
+  const ysrc = yd.slice(0, 7) === st.month ? st.data : (LS.get('kh_cache_' + yd.slice(0, 7), null) || {}).data;
+  const yt = ysrc ? totals(Object.assign(emptyData(), ysrc), r => r.date === yd) : null, yLeft = yt ? Math.round((yt.inQty + yt.carry - yt.soldKg - yt.lossQty) * 100) / 100 : 0;
+  const carryBtn = t.carry ? `<span class="cbtn done">✅ اترحّل من امبارح ${fmt(t.carry)}</span>` : yLeft > 0 ? `<button class="cbtn" onclick="carryOver(${yLeft})">➕ رحّل باقي امبارح ${fmt(yLeft)} كيلو</button>` : '';
+  const sp = $('#salePill'); sp.className = 'spill' + (avail && left <= 0 ? ' out' : avail && pctL < 20 ? ' low' : '');
+  sp.innerHTML = `🥛 وارد ${fmt(avail)} · باقي <b>${fmt(left)}</b> كيلو` + (!t.carry && yLeft > 0 ? ` <button class="cplus" title="رحّل باقي امبارح" onclick="carryOver(${yLeft})">+${fmt(yLeft)}</button>` : '');
+  const sc = $('#stockCard'); sc.className = 'stock' + (avail && left <= 0 ? ' out' : avail && pctL < 20 ? ' low' : '');
+  sc.innerHTML = `<div class="top"><div><span>🥛 المتبقي من وارد النهارده</span><strong>${fmt(left)} <small>كيلو</small></strong></div><div style="text-align:left"><span>الوارد${t.carry ? ' + المرحّل' : ''}</span><strong style="font-size:20px">${fmt(avail)} <small>كيلو</small></strong></div></div>
     <div class="bar"><i style="width:${pctL}%"></i></div>
-    <div class="row"><span>💰 اتباع <b>${fmt(t.soldKg)}</b> كيلو</span>${t.lossQty ? `<span>⚠️ خسارة <b>${fmt(t.lossQty)}</b></span>` : ''}<span>${t.inQty ? Math.round(pctL) + '% باقي' : 'لسه مفيش وارد النهارده'}</span></div>`;
+    <div class="row"><span>💰 اتباع <b>${fmt(t.soldKg)}</b> كيلو</span>${t.lossQty ? `<span>⚠️ خسارة <b>${fmt(t.lossQty)}</b></span>` : ''}<span>${avail ? Math.round(pctL) + '% باقي' : 'لسه مفيش وارد النهارده'}</span></div>${carryBtn ? `<div style="margin-top:8px">${carryBtn}</div>` : ''}`;
   $('#todayKpis').innerHTML = kpi('💵 ربح النهارده', money(t.profit), 'big' + (t.profit < 0 ? ' neg' : '')) +
     kpi('💰 المبيعات', money(t.sales)) + kpi('⚖️ اتباع', kg(t.soldKg)) + kpi('🥛 الوارد', kg(t.inQty)) + kpi('🧾 المصاريف', money(t.exp));
   const all = [
