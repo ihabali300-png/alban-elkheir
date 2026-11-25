@@ -12,10 +12,10 @@
 <link rel="icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050f08;--card:#0b1a0f;--card2:#11261a;--bd:#1f3b29;--txt:#e7f5e9;--mut:#8fb39a;--acc:#a3e635;--acc2:#bef264;--red:#f87171;--grn:#4ade80;--amb:#fbbf24;--blu:#60a5fa;--r:16px}
+:root{--scheme:dark;--hdr:#050f08ee;--nav:#071309;--in:#07140b;--onacc:#0b1a0f;--sel:#1a2e05;--selb:#3f6212;--sel2:#14532d;--bg:#050f08;--card:#0b1a0f;--card2:#11261a;--bd:#1f3b29;--txt:#e7f5e9;--mut:#8fb39a;--acc:#a3e635;--acc2:#bef264;--red:#f87171;--grn:#4ade80;--amb:#fbbf24;--blu:#60a5fa;--r:16px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Cairo,Tahoma,sans-serif;font-size:15px}
-header{position:sticky;top:0;z-index:20;background:#050f08ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);padding:calc(9px + env(safe-area-inset-top)) 12px 9px;display:flex;align-items:center;gap:8px}
+header{position:sticky;top:0;z-index:20;background:var(--hdr);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);padding:calc(9px + env(safe-area-inset-top)) 12px 9px;display:flex;align-items:center;gap:8px}
 header h1{margin:0;font-size:19px;font-weight:800;flex:1;color:var(--acc)}
 header small{display:block;font-size:11px;color:var(--mut);font-weight:600}
 .hbtn{position:relative;background:var(--card2);border:1px solid var(--bd);color:var(--txt);border-radius:12px;padding:6px 10px;font-size:16px;font-family:inherit}
@@ -23,7 +23,7 @@ header small{display:block;font-size:11px;color:var(--mut);font-weight:600}
 .hbtn.spin{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 #sync{font-size:11px;background:var(--card2);border:1px solid var(--bd);border-radius:20px;padding:4px 9px;white-space:nowrap}
 main{padding:12px 12px calc(84px + env(safe-area-inset-bottom));max-width:640px;margin:auto}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#071309;border-top:1px solid var(--bd);display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--nav);border-top:1px solid var(--bd);display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
 nav button{border:0;background:none;font-family:inherit;padding:7px 0 6px;font-size:10.5px;color:var(--mut);font-weight:700;display:flex;flex-direction:column;align-items:center;gap:1px}
 nav button b{font-size:20px;line-height:1.25}
 nav button.on{color:var(--acc)}
@@ -46,23 +46,23 @@ details.cur>.in{padding:0 14px 14px}
 .kpi{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:11px 12px}
 .kpi span{display:block;font-size:12px;color:var(--mut);font-weight:700}
 .kpi strong{font-size:19px;font-weight:800}
-.kpi.big{grid-column:1/-1;background:linear-gradient(135deg,#14532d,#1a2e05);border-color:#3f6212}
+.kpi.big{grid-column:1/-1;background:linear-gradient(135deg,var(--sel2),var(--sel));border-color:var(--selb)}
 .kpi.big span{color:var(--acc2)}.kpi.big strong{font-size:26px;color:var(--acc)}
 .kpi.neg{background:linear-gradient(135deg,#450a0a,#2a0a0a);border-color:#7f1d1d}.kpi.neg strong{color:var(--red)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .full{grid-column:1/-1}
 label{font-size:12px;font-weight:700;color:var(--mut);display:block;margin-bottom:3px}
-input,select,textarea{width:100%;font-family:inherit;font-size:16px;padding:10px 11px;border:1.5px solid var(--bd);border-radius:12px;background:#07140b;color:var(--txt);outline:none}
+input,select,textarea{width:100%;font-family:inherit;font-size:16px;padding:10px 11px;border:1.5px solid var(--bd);border-radius:12px;background:var(--in);color:var(--txt);outline:none}
 input:focus,select:focus{border-color:var(--acc)}
-input[type=date],input[type=month]{color-scheme:dark}
-.btn{width:100%;border:0;border-radius:12px;padding:12px;font-family:inherit;font-size:16px;font-weight:800;background:var(--acc);color:#0b1a0f;margin-top:4px}
+input[type=date],input[type=month]{color-scheme:var(--scheme)}
+.btn{width:100%;border:0;border-radius:12px;padding:12px;font-family:inherit;font-size:16px;font-weight:800;background:var(--acc);color:var(--onacc);margin-top:4px}
 .btn:active{transform:scale(.98)}
 .btn.sec{background:var(--card2);color:var(--acc2);border:1px solid var(--bd)}
 .btn.sm{width:auto;padding:7px 12px;font-size:13px;margin:0}
-.seg{display:flex;background:#07140b;border:1px solid var(--bd);border-radius:12px;padding:3px;margin-bottom:12px}
+.seg{display:flex;background:var(--in);border:1px solid var(--bd);border-radius:12px;padding:3px;margin-bottom:12px}
 .seg button{flex:1;border:0;background:none;font-family:inherit;font-weight:800;font-size:14px;padding:8px;border-radius:10px;color:var(--mut)}
-.seg button.on{background:var(--acc);color:#0b1a0f}
-.total{background:#1a2e05;border:1px solid #3f6212;border-radius:12px;padding:9px 12px;font-weight:800;color:var(--acc);display:flex;justify-content:space-between}
+.seg button.on{background:var(--acc);color:var(--onacc)}
+.total{background:var(--sel);border:1px solid var(--selb);border-radius:12px;padding:9px 12px;font-weight:800;color:var(--acc);display:flex;justify-content:space-between}
 .item{display:flex;align-items:center;gap:7px;padding:9px 0;border-bottom:1px dashed var(--bd)}
 .item:last-child{border:0}
 .item .t{flex:1;min-width:0}
@@ -72,9 +72,9 @@ input[type=date],input[type=month]{color-scheme:dark}
 .ib{border:0;background:var(--card2);color:var(--txt);border-radius:10px;padding:6px 8px;font-size:13px;font-family:inherit;font-weight:800;white-space:nowrap}
 .ib.del{background:#3b0d0d;color:var(--red)}
 .ib.del.armed{background:#dc2626;color:#fff}
-.day{font-size:12px;font-weight:800;color:#0b1a0f;background:var(--acc2);border-radius:8px;padding:2px 9px;display:inline-block;margin:10px 0 2px}
+.day{font-size:12px;font-weight:800;color:var(--onacc);background:var(--acc2);border-radius:8px;padding:2px 9px;display:inline-block;margin:10px 0 2px}
 .empty{color:var(--mut);text-align:center;padding:14px;font-size:13px}
-.person{border:1px solid var(--bd);background:#07140b;border-radius:14px;padding:11px;margin-bottom:9px}
+.person{border:1px solid var(--bd);background:var(--in);border-radius:14px;padding:11px;margin-bottom:9px}
 .person .top{display:flex;align-items:center;gap:8px}
 .person .top b{flex:1;font-size:15px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:9px 0}
@@ -88,13 +88,13 @@ th,td{padding:7px 6px;text-align:center;border-bottom:1px solid var(--bd)}
 th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .pos{color:var(--grn);font-weight:800}.neg{color:var(--red);font-weight:800}
 .prods{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.prods button{border:1.5px solid var(--bd);background:#07140b;color:var(--txt);border-radius:13px;padding:9px 3px;font-family:inherit;font-weight:800;font-size:13px;line-height:1.35}
+.prods button{border:1.5px solid var(--bd);background:var(--in);color:var(--txt);border-radius:13px;padding:9px 3px;font-family:inherit;font-weight:800;font-size:13px;line-height:1.35}
 .prods button small{display:block;font-size:10.5px;color:var(--mut);font-weight:700}
-.prods button.on{border-color:var(--acc);background:#1a2e05;color:var(--acc)}
+.prods button.on{border-color:var(--acc);background:var(--sel);color:var(--acc)}
 .sizes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sizes button{border:1.5px solid var(--bd);background:#07140b;color:var(--txt);border-radius:13px;padding:10px;font-family:inherit;font-weight:800;font-size:15px}
+.sizes button{border:1.5px solid var(--bd);background:var(--in);color:var(--txt);border-radius:13px;padding:10px;font-family:inherit;font-weight:800;font-size:15px}
 .sizes button small{display:block;font-size:12px;color:var(--mut)}
-.sizes button.on{border-color:var(--acc);background:#1a2e05;color:var(--acc)}
+.sizes button.on{border-color:var(--acc);background:var(--sel);color:var(--acc)}
 .stepper{display:flex;align-items:center;gap:8px}
 .stepper button{width:46px;height:46px;border-radius:12px;border:1px solid var(--bd);background:var(--card2);color:var(--acc);font-size:24px;font-weight:800;font-family:inherit}
 .stepper input{text-align:center;font-size:20px;font-weight:800}
@@ -109,7 +109,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .sheet{background:var(--card);border:1px solid var(--bd);border-bottom:0;width:100%;max-width:640px;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:up .25s}
 @keyframes up{from{transform:translateY(100%)}to{transform:none}}
 .sheet h2{margin:0 0 12px;font-size:17px;color:var(--acc)}
-#toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:#1a2e05;border:1px solid var(--acc);color:var(--acc2);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%;text-align:center}
+#toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--sel);border:1px solid var(--acc);color:var(--acc2);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%;text-align:center}
 #toast.on{opacity:1;transform:translateX(-50%)}
 .hint{font-size:12px;color:var(--mut);line-height:1.7}
 .badge{font-size:11px;padding:1px 8px;border-radius:20px;font-weight:800}
@@ -121,13 +121,33 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .qrow small{color:var(--mut);font-size:11px;display:block}
 .qrow.done input{border-color:var(--acc)}
 .warn{background:#422006;border:1px solid #a16207;color:#fde68a;border-radius:12px;padding:10px;font-size:13px;font-weight:700;margin-bottom:12px}
-#updCard{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:70;max-width:420px;margin:auto;background:#050f08;border:1px solid #a3e63599;border-radius:16px;padding:14px;box-shadow:0 8px 30px #000c;display:none}
+#updCard{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:70;max-width:420px;margin:auto;background:var(--bg);border:1px solid #a3e63599;border-radius:16px;padding:14px;box-shadow:0 8px 30px #000c;display:none}
 #updCard.on{display:block}
 #updCard .uh{color:var(--acc);font-weight:800;margin-bottom:6px}
 #updCard ul{margin:4px 0 10px;padding-inline-start:20px;line-height:1.8}
 #updCard .ub{display:flex;gap:8px}
-#updCard .ub button{flex:1;border:0;border-radius:10px;padding:9px;font-family:inherit;font-weight:800;font-size:14px;background:var(--acc);color:#0b1a0f}
+#updCard .ub button{flex:1;border:0;border-radius:10px;padding:9px;font-family:inherit;font-weight:800;font-size:14px;background:var(--acc);color:var(--onacc)}
 #updCard .ub button+button{background:var(--card2);color:var(--txt)}
+.chart{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.chart .ch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.chart .ch b{flex:1;font-size:15px;color:var(--acc2);min-width:130px}
+.chips{display:flex;gap:4px}
+.chips button{border:1px solid var(--bd);background:var(--in);color:var(--mut);border-radius:20px;padding:3px 9px;font-family:inherit;font-weight:800;font-size:12px}
+.chips button.on{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
+.chart canvas{display:block;width:100%}
+.leg{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:6px;font-size:12px}
+.leg div{display:flex;align-items:center;gap:5px;min-width:0}
+.leg i{width:10px;height:10px;border-radius:3px;flex:none}
+.leg span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.leg small{color:var(--mut);white-space:nowrap}
+.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.themes button{border:2px solid var(--bd);border-radius:12px;padding:8px 4px;font-family:inherit;font-weight:800;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.themes button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.themes button i{display:flex;gap:3px}
+.themes button i b{width:13px;height:13px;border-radius:50%;border:1px solid #8884}
+.cpick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cpick label{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:6px 9px;margin:0;color:var(--txt)}
+.cpick input{width:42px;height:30px;padding:0;border:0;background:none}
 </style>
 </head>
 <body>
@@ -297,6 +317,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
   <section class="tab" id="t-sum">
     <div class="card"><label>اختار الشهر</label><input type="month" id="sumMonth" onchange="loadSum()"></div>
     <div class="kpis" id="sumKpis"></div>
+    <div id="charts"></div>
     <details class="cur" open><summary>📆 الملخص اليومي</summary><div class="in tbl" id="sumDaily"></div></details>
     <details class="cur"><summary>🧀 المبيعات حسب المنتج</summary><div class="in" id="sumProducts"></div></details>
     <details class="cur"><summary>🧾 المصاريف حسب البند</summary><div class="in" id="sumExp"></div></details>
@@ -324,6 +345,13 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
       <div><label>اسم المحل</label><input id="s_shop"></div>
       <div><label>العملة</label><input id="s_cur"></div>
       <div class="full"><label>بنود المصاريف (افصل بفاصلة)</label><textarea id="s_cats" rows="2"></textarea></div>
+      <div class="full"><label>🎨 الثيم</label><div class="themes" id="themeGrid"></div></div>
+      <div class="full"><label>🖌️ ألوان مخصصة (بتتحفظ كثيم «مخصص»)</label><div class="cpick">
+        <label>الخلفية<input type="color" id="c_bg" oninput="customTheme()"></label>
+        <label>الكروت<input type="color" id="c_card" oninput="customTheme()"></label>
+        <label>اللون الأساسي<input type="color" id="c_acc" oninput="customTheme()"></label>
+        <label>الكلام<input type="color" id="c_txt" oninput="customTheme()"></label>
+      </div></div>
       <div class="full"><button class="btn" onclick="saveSettings()">💾 حفظ الإعدادات</button></div>
       <div class="full"><button class="btn sec" onclick="testConn()">🔌 تجربة الاتصال</button></div>
       <div class="full hint">🔐 البيانات بتتسجل في شيت جوجل على حساب صاحب المحل بس.<br>📴 لو النت فصل، التسجيل بيتحفظ على الموبايل ويتبعت أول ما النت يرجع.</div>
@@ -341,7 +369,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 6;
+const APP_V = 7;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -805,6 +833,7 @@ function renderSum() {
   $('#sumPeriods').innerHTML = pp.length ? pp.map(([p]) => `<div class="person"><div class="top"><b>${esc(p.name)}</b><small class="hint">${esc(p.cycle)} · ${fmt(p.price)} للكيلو</small></div><div class="tbl"><table><tr><th>الفترة</th><th>الكمية</th><th>المبلغ</th><th>سلف</th><th>الصافي</th></tr>` +
     periods(p.cycle, sumSt.month).map(per => { const o = perStats(sumSt, p.id, per); return `<tr><td>${perLbl(per, sumSt.month)}</td><td>${fmt(o.kg)}</td><td>${fmt(o.amt)}</td><td>${fmt(o.adv)}</td><td class="${o.net > 0 ? 'neg' : 'pos'}">${fmt(o.net)}</td></tr>`; }).join('') + '</table></div></div>').join('')
     : '<div class="empty">كل الموردين حسابهم شهري 📭</div>';
+  renderCharts();
 }
 
 /* ===== الإعدادات ===== */
@@ -820,6 +849,115 @@ async function testConn() {
   cfg = old;
 }
 
+
+/* ===== 🎨 الثيمات ===== */
+const THEMES = [
+  ['ليموني', '#050f08', '#0b1a0f', '#a3e635', '#e7f5e9'], ['بحري', '#04101c', '#0a1a2c', '#38bdf8', '#e6f3ff'],
+  ['بنفسجي', '#0e0718', '#1a1030', '#c084fc', '#f3e8ff'], ['ذهبي', '#0f0c05', '#1c170a', '#facc15', '#fff8e1'],
+  ['وردي', '#170710', '#26101d', '#f472b6', '#ffe4f1'], ['برتقالي', '#140a04', '#24140a', '#fb923c', '#fff1e6'],
+  ['أحمر', '#140606', '#250d0d', '#f87171', '#ffe9e9'], ['زمردي', '#03110d', '#0a2019', '#34d399', '#e6fff6'],
+  ['نيون', '#070a1a', '#0f1430', '#818cf8', '#e0e7ff'], ['فحمي', '#0b0b0d', '#17171b', '#e5e7eb', '#f4f4f5'],
+  ['حليبي', '#f7f4ec', '#ffffff', '#15803d', '#1c1917'], ['سماوي فاتح', '#f1f5f9', '#ffffff', '#2563eb', '#0f172a'],
+  ['وردي فاتح', '#fdf2f8', '#ffffff', '#db2777', '#3b0a24'], ['نعناعي', '#ecfdf5', '#ffffff', '#059669', '#052e16'],
+  ['كراميل', '#fbf6ef', '#fffdf9', '#b45309', '#2b1a0c']
+];
+const hx = h => { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const toHex = a => '#' + a.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+const mix = (a, b, t) => { const A = hx(a), B = hx(b); return toHex(A.map((v, i) => v + (B[i] - v) * t)); };
+const lum = c => { const [r, g, b] = hx(c).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * r + .7152 * g + .0722 * b; };
+let TH = LS.get('kh_theme', { name: 'ليموني' });
+function themeVars(bg, card, acc, txt) {
+  const light = lum(bg) > .5;
+  return { light, v: { bg, card, acc, txt, scheme: light ? 'light' : 'dark', card2: mix(card, txt, light ? .05 : .07), bd: mix(card, txt, light ? .14 : .16),
+    mut: mix(txt, bg, .42), acc2: mix(acc, txt, light ? .15 : .3), in: light ? mix(bg, card, .6) : mix(bg, card, .45), sel: mix(card, acc, light ? .12 : .16),
+    selb: mix(card, acc, .45), sel2: mix(bg, acc, light ? .22 : .3), hdr: bg + 'ee', nav: mix(bg, card, .6), onacc: lum(acc) > .35 ? '#0b1a0f' : '#ffffff' } };
+}
+let THL = false;
+function applyTheme(t) {
+  TH = t; LS.set('kh_theme', t);
+  const base = t.name === 'مخصص' ? [t.name, t.bg, t.card, t.acc, t.txt] : (THEMES.find(x => x[0] === t.name) || THEMES[0]);
+  const { light, v } = themeVars(base[1], base[2], base[3], base[4]); THL = light;
+  Object.entries(v).forEach(([k, c]) => document.documentElement.style.setProperty('--' + k, c));
+  document.querySelector('meta[name=theme-color]').content = base[1];
+  ['c_bg', 'c_card', 'c_acc', 'c_txt'].forEach((id, i) => { const e = $('#' + id); if (e) e.value = base[i + 1]; });
+  renderThemeGrid();
+  if (sumSt && $('#t-sum').classList.contains('on')) renderCharts();
+}
+function renderThemeGrid() {
+  const g = $('#themeGrid'); if (!g) return;
+  const all = [...THEMES]; if (TH.name === 'مخصص') all.push(['مخصص', TH.bg, TH.card, TH.acc, TH.txt]);
+  g.innerHTML = all.map(([n, bg, card, acc, txt]) => `<button class="${TH.name === n ? 'on' : ''}" style="background:${bg};color:${txt}" onclick="applyTheme({name:'${n}'${n === 'مخصص' ? `,bg:'${bg}',card:'${card}',acc:'${acc}',txt:'${txt}'` : ''}})"><i><b style="background:${card}"></b><b style="background:${acc}"></b></i>${n === 'مخصص' ? '🎨 ' : ''}${n}</button>`).join('');
+}
+function customTheme() { applyTheme({ name: 'مخصص', bg: $('#c_bg').value, card: $('#c_card').value, acc: $('#c_acc').value, txt: $('#c_txt').value }); }
+const cssv = k => getComputedStyle(document.documentElement).getPropertyValue('--' + k).trim();
+
+/* ===== 📊 الرسوم البيانية ثلاثية الأبعاد ===== */
+function hsl2hex(h, s, l) { s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return toHex([f(0) * 255, f(8) * 255, f(4) * 255]); }
+function hueOf(c) { let [r, g, b] = hx(c).map(v => v / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (h * 60 + 360) % 360; }
+function palette(n) { const acc = cssv('acc'), h0 = hueOf(acc), out = [acc]; for (let i = 1; i < n; i++) out.push(hsl2hex((h0 + i * 137.5) % 360, 72, THL ? 46 : 62)); return out; }
+const shade = (c, t) => mix(c, '#000000', t), tint = (c, t) => mix(c, '#ffffff', t);
+const CHT = LS.get('kh_charts', { prod: 'pie', exp: 'donut', sup: 'pie', daily: 'profit' });
+function setCh(k, v) { CHT[k] = v; LS.set('kh_charts', CHT); renderCharts(); }
+function canvasFor(id, h) {
+  const c = $('#' + id); if (!c) return null; const w = c.parentElement.clientWidth - 24 || 300, dpr = Math.min(1.75, devicePixelRatio || 1);
+  c.width = w * dpr; c.height = h * dpr; c.style.height = h + 'px'; const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h); return [x, w, h];
+}
+function pie3d(id, items, donut, p) {
+  const r = canvasFor(id, 230); if (!r) return; const [x, w, h] = r, tot = items.reduce((s, i) => s + i.value, 0) || 1;
+  const rx = Math.min(w * .44, 165), ry = rx * .5, dep = Math.max(14, rx * .16), cx = w / 2, cy = h / 2 - dep / 2 + 4, hole = .55;
+  let a = -Math.PI / 2; const sl = items.map(i => { const a0 = a; a += i.value / tot * Math.PI * 2 * p; return { ...i, a0, a1: a }; });
+  const path = (s, y) => { x.beginPath(); x.ellipse(cx, y, rx, ry, 0, s.a0, s.a1); if (donut) x.ellipse(cx, y, rx * hole, ry * hole, 0, s.a1, s.a0, true); else x.lineTo(cx, y); x.closePath(); };
+  for (let d = dep; d > 0; d -= 1) sl.forEach(s => { path(s, cy + d); x.fillStyle = shade(s.color, d === dep ? .55 : .38); x.fill(); });
+  sl.forEach(s => { path(s, cy); const g = x.createLinearGradient(0, cy - ry, 0, cy + ry); g.addColorStop(0, tint(s.color, .18)); g.addColorStop(1, s.color); x.fillStyle = g; x.fill(); x.strokeStyle = cssv('card'); x.lineWidth = 1.5; x.stroke(); });
+  if (p < 1) return;
+  x.font = '800 12px Cairo,Tahoma'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  sl.forEach(s => { const pct = s.value / tot; if (pct < .05) return; const m = (s.a0 + s.a1) / 2, k = donut ? (1 + hole) / 2 : .66;
+    const tx = cx + Math.cos(m) * rx * k, ty = cy + Math.sin(m) * ry * k; x.fillStyle = lum(s.color) > .45 ? '#0b1a0f' : '#fff'; x.fillText(Math.round(pct * 100) + '%', tx, ty); });
+  if (donut) { x.fillStyle = cssv('txt'); x.font = '800 14px Cairo,Tahoma'; x.fillText(fmt(tot), cx, cy); }
+}
+function bars3d(id, items, p, valFmt) {
+  const r = canvasFor(id, 240); if (!r) return; const [x, w, h] = r, n = items.length; if (!n) return;
+  const vals = items.map(i => i.value), mx = Math.max(0, ...vals), mn = Math.min(0, ...vals), span = (mx - mn) || 1;
+  const L = 8, R = 14, T = 26, B = 30, pw = w - L - R, ph = h - T - B, y0 = T + mx / span * ph, slot = pw / n, bw = Math.max(4, slot * .62), dx = Math.min(bw * .45, 12), dy = dx * .6;
+  x.strokeStyle = cssv('bd'); x.lineWidth = 1; for (let i = 0; i <= 4; i++) { const yy = T + ph * i / 4; x.beginPath(); x.moveTo(L, yy); x.lineTo(w - R + dx, yy); x.stroke(); }
+  x.font = '700 10px Cairo,Tahoma'; x.textAlign = 'center'; x.textBaseline = 'top';
+  const step = Math.ceil(n / 10);
+  items.forEach((it, i) => {
+    const v = it.value * p, bx = L + slot * i + (slot - bw) / 2, yt = y0 - v / span * ph, top = Math.min(yt, y0), bot = Math.max(yt, y0), c = it.color;
+    x.fillStyle = shade(c, .35); x.beginPath(); x.moveTo(bx + bw, top); x.lineTo(bx + bw + dx, top - dy); x.lineTo(bx + bw + dx, bot - dy); x.lineTo(bx + bw, bot); x.fill();
+    const g = x.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, tint(c, .12)); g.addColorStop(1, c); x.fillStyle = g; x.fillRect(bx, top, bw, bot - top);
+    x.fillStyle = tint(c, .3); x.beginPath(); x.moveTo(bx, top); x.lineTo(bx + dx, top - dy); x.lineTo(bx + bw + dx, top - dy); x.lineTo(bx + bw, top); x.fill();
+    if (i % step === 0) { x.fillStyle = cssv('mut'); x.fillText(it.short ?? it.label, bx + bw / 2, h - B + 8); }
+    if (p === 1 && n <= 12 && it.value) { x.fillStyle = cssv('txt'); x.textBaseline = 'bottom'; x.fillText(valFmt ? valFmt(it.value) : fmt(it.value), bx + bw / 2 + dx / 2, (it.value >= 0 ? top : bot + 14) - dy - 2); x.textBaseline = 'top'; }
+  });
+  x.strokeStyle = cssv('mut'); x.beginPath(); x.moveTo(L, y0); x.lineTo(w - R + dx, y0); x.stroke();
+}
+function topN(map, n) { const e = Object.entries(map).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]); if (e.length <= n) return e; const rest = e.slice(n - 1).reduce((s, [, v]) => s + v, 0); return [...e.slice(0, n - 1), ['الباقي', rest]]; }
+const legend = (items, f) => { const t = items.reduce((s, i) => s + i.value, 0) || 1; return `<div class="leg">${items.map(i => `<div><i style="background:${i.color}"></i><span>${esc(i.label)}</span><small>${f(i.value)} · ${Math.round(i.value / t * 100)}%</small></div>`).join('')}</div>`; };
+const chips = (k, opts) => `<div class="chips">${opts.map(([v, l]) => `<button class="${CHT[k] === v ? 'on' : ''}" onclick="setCh('${k}','${v}')">${l}</button>`).join('')}</div>`;
+const TYPES = [['pie', '🍰 كيكة'], ['donut', '🍩 دونات'], ['bars', '📊 أعمدة']];
+let chAnim = 0;
+function renderCharts() {
+  const box = $('#charts'); if (!box || !sumSt) return;
+  const d = sumSt.data, money0 = v => fmt(v);
+  const g = (arr, k, v) => { const o = {}; arr.forEach(r => o[r[k] || '—'] = (o[r[k] || '—'] || 0) + num(r[v])); return o; };
+  const sets = [
+    ['prod', '🧀 المبيعات حسب المنتج', topN(g(d.sales, 'product', 'total'), 8), money0],
+    ['exp', '🧾 المصاريف حسب البند', topN(g(d.expenses, 'category', 'amount'), 8), money0],
+    ['sup', '🥛 الوارد حسب المورد (كيلو)', topN(g(d.intake, 'name', 'qty'), 8), v => fmt(v) + ' ك']
+  ].map(([k, t, e, f]) => { const pal = palette(e.length); return [k, t, e.map(([l, v], i) => ({ label: l, short: String(l).split(' ')[0].slice(0, 7), value: v, color: l === 'الباقي' ? cssv('mut') : pal[i] })), f]; });
+  const dates = [...new Set([...d.intake, ...d.sales, ...d.expenses].map(r => r.date))].sort();
+  const dm = CHT.daily, acc = cssv('acc'), red = '#ef4444';
+  const daily = dates.map(dt => { const t = totals(d, r => r.date === dt), v = dm === 'sales' ? t.sales : dm === 'kg' ? t.inQty : t.profit; return { label: dt, short: String(+dt.slice(8)), value: v, color: v < 0 ? red : dm === 'kg' ? palette(3)[1] : acc }; });
+  box.innerHTML = (daily.length ? `<div class="chart"><div class="ch"><b>📅 كل يوم في الشهر</b>${chips('daily', [['profit', '💵 الربح'], ['sales', '💰 المبيعات'], ['kg', '🥛 الوارد']])}</div><canvas id="cv_daily"></canvas></div>` : '') +
+    sets.filter(([, , it]) => it.length).map(([k, t, it, f]) => `<div class="chart"><div class="ch"><b>${t}</b>${chips(k, TYPES)}</div><canvas id="cv_${k}"></canvas>${legend(it, f)}</div>`).join('');
+  const draw = p => { if (daily.length) bars3d('cv_daily', daily, p, v => fmt(v)); sets.forEach(([k, , it]) => { if (!it.length) return; CHT[k] === 'bars' ? bars3d('cv_' + k, it, p) : pie3d('cv_' + k, it, CHT[k] === 'donut', p); }); };
+  const id = ++chAnim, t0 = performance.now();
+  const tick = now => { if (id !== chAnim) return; const p = Math.min(1, (now - t0) / 650), e = 1 - Math.pow(1 - p, 3); draw(e); if (p < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+let rzT; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => { if (sumSt && $('#t-sum').classList.contains('on')) renderCharts(); }, 250); });
+
 /* ===== تشغيل ===== */
 function setDates() { ['dg_date', 'in_date', 'sa_date', 'ex_date', 'lo_date'].forEach(i => $('#' + i).value = today()); $('#sumMonth').value = curMonth(); }
 let lastDay = today();
@@ -830,7 +968,7 @@ document.addEventListener('visibilitychange', () => {
   if (lastDay !== today()) { lastDay = today(); setDates(); if (st.month !== curMonth()) reloadAll(); else renderHome(); }
   flush();
 });
-setDates(); renderAll(); renderCart(); updSync();
+applyTheme(TH); setDates(); renderAll(); renderCart(); updSync();
 if (cfg.url) reloadAll(); else setTimeout(openSettings, 400);
 
 /* ===== ⟳ التحديث ===== */
