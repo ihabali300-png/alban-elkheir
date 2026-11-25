@@ -131,6 +131,9 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .stock .row b{color:var(--txt)}
 .stock.low strong,.stock.low .bar i{color:var(--amb);background:var(--amb)}.stock.low strong{background:none}
 .stock.out strong{color:var(--red)}.stock.out .bar i{background:var(--red)}
+.spill{margin-inline-start:auto;font-size:12px;font-weight:800;color:var(--txt);background:var(--sel);border:1px solid var(--selb);border-radius:12px;padding:4px 9px;line-height:1.5;text-align:center}
+.spill b{color:var(--acc);font-size:15px}
+.spill.low b{color:var(--amb)}.spill.out b{color:var(--red)}
 .warn{background:#422006;border:1px solid #a16207;color:#fde68a;border-radius:12px;padding:10px;font-size:13px;font-weight:700;margin-bottom:12px}
 #updCard{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:70;max-width:420px;margin:auto;background:var(--bg);border:1px solid #a3e63599;border-radius:16px;padding:14px;box-shadow:0 8px 30px #000c;display:none}
 #updCard.on{display:block}
@@ -191,7 +194,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
   <!-- ===== البيع ===== -->
   <section class="tab" id="t-sales">
     <div class="card">
-      <h2>💰 بيع جديد</h2>
+      <h2>💰 بيع جديد <span class="spill" id="salePill"></span></h2>
       <label>اختار المنتج</label>
       <div class="prods" id="prodGrid"></div>
       <div id="saleBox" style="display:none;margin-top:12px">
@@ -381,7 +384,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 8;
+const APP_V = 9;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -758,6 +761,8 @@ function renderHome() {
   const td = today(), t = totals(st.data, r => r.date === td);
   $('#todayLbl').textContent = dayName(td) + ' ' + td;
   const left = t.inQty - t.soldKg - t.lossQty, pctL = t.inQty ? Math.max(0, Math.min(100, left / t.inQty * 100)) : 0;
+  const sp = $('#salePill'); sp.className = 'spill' + (t.inQty && left <= 0 ? ' out' : t.inQty && pctL < 20 ? ' low' : '');
+  sp.innerHTML = `🥛 وارد ${fmt(t.inQty)} · باقي <b>${fmt(left)}</b> كيلو`;
   const sc = $('#stockCard'); sc.className = 'stock' + (t.inQty && left <= 0 ? ' out' : t.inQty && pctL < 20 ? ' low' : '');
   sc.innerHTML = `<div class="top"><div><span>🥛 المتبقي من وارد النهارده</span><strong>${fmt(left)} <small>كيلو</small></strong></div><div style="text-align:left"><span>الوارد</span><strong style="font-size:20px">${fmt(t.inQty)} <small>كيلو</small></strong></div></div>
     <div class="bar"><i style="width:${pctL}%"></i></div>
