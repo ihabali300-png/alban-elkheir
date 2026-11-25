@@ -395,7 +395,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 11;
+const APP_V = 12;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -623,14 +623,22 @@ function saveIntake() {
 
 /* باقي امبارح بيترحّل لوحده: باقي أي يوم = وارده + باقي اليوم اللي قبله − المباع − الخسارة */
 function leftOf(src, date, carry) { const t = totals(Object.assign(emptyData(), src), r => r.date === date); return Math.max(0, t.inQty + carry - t.soldKg - t.lossQty); }
+function trackStart() {
+  let t0 = LS.get('kh_t0', '');
+  const f = st.data.sales.map(r => r.date).filter(Boolean).sort()[0];
+  if (f && (!t0 || f < t0)) { t0 = f; LS.set('kh_t0', t0); }
+  return t0;
+}
 function carryFor(date) {
+  const t0 = trackStart(); if (!t0 || date <= t0) return 0;
   const m = date.slice(0, 7), dd = +date.slice(8);
   const pm = (() => { const x = new Date(m + '-01T12:00'); x.setMonth(x.getMonth() - 1); return x.toISOString().slice(0, 7); })();
   const prev = m === st.month ? null : null, pc = LS.get('kh_cache_' + pm, null);
   let c = 0;
-  if (pc && pc.data) { const n = new Date(+pm.slice(0, 4), +pm.slice(5, 7), 0).getDate(); for (let i = 1; i <= n; i++) c = leftOf(pc.data, pm + '-' + String(i).padStart(2, '0'), c); }
+  const step = (src, d) => { c = d < t0 ? 0 : leftOf(src, d, c); };
+  if (pc && pc.data) { const n = new Date(+pm.slice(0, 4), +pm.slice(5, 7), 0).getDate(); for (let i = 1; i <= n; i++) step(pc.data, pm + '-' + String(i).padStart(2, '0')); }
   const src = m === st.month ? st.data : (LS.get('kh_cache_' + m, null) || {}).data || emptyData();
-  for (let i = 1; i < dd; i++) c = leftOf(src, m + '-' + String(i).padStart(2, '0'), c);
+  for (let i = 1; i < dd; i++) step(src, m + '-' + String(i).padStart(2, '0'));
   return Math.round(c * 100) / 100;
 }
 function carryOver(q) {
@@ -792,13 +800,14 @@ function renderHome() {
   $('#todayLbl').textContent = dayName(td) + ' ' + td;
   const carry = carryFor(td), avail = t.inQty + carry, left = avail - t.soldKg - t.lossQty, pctL = avail ? Math.max(0, Math.min(100, left / avail * 100)) : 0;
   const sp = $('#salePill'); sp.className = 'spill' + (avail && left <= 0 ? ' out' : avail && pctL < 20 ? ' low' : '');
-  sp.innerHTML = `🥛 إجمالي ${fmt(avail)} · باقي <b>${fmt(left)}</b> كيلو`;
+  const used = t.soldKg + t.lossQty, cLeft = Math.max(0, carry - used), iLeft = Math.max(0, t.inQty - Math.max(0, used - carry));
+  sp.innerHTML = `🥛 باقي <b>${fmt(left)}</b> من ${fmt(avail)} كيلو`;
   const sc = $('#stockCard'); sc.className = 'stock' + (avail && left <= 0 ? ' out' : avail && pctL < 20 ? ' low' : '');
-  sc.innerHTML = `<div class="eq"><div class="eqb"><span>📥 وارد النهارده</span><b>${fmt(t.inQty)}</b><small>كيلو</small></div><i class="sign">+</i>
-      <div class="eqb"><span>↩️ باقي امبارح</span><b>${fmt(carry)}</b><small>كيلو</small></div><i class="sign">=</i>
-      <div class="eqb tot"><span>🥛 إجمالي اليوم</span><b>${fmt(avail)}</b><small>كيلو</small></div></div>
+  sc.innerHTML = `<div class="eq"><div class="eqb"><span>📥 وارد النهارده</span><b>${fmt(iLeft)}</b><small>من ${fmt(t.inQty)} كيلو</small></div><i class="sign">+</i>
+      <div class="eqb"><span>↩️ باقي امبارح</span><b>${fmt(cLeft)}</b><small>من ${fmt(carry)} كيلو</small></div><i class="sign">=</i>
+      <div class="eqb tot"><span>🥛 المتبقي</span><b>${fmt(left)}</b><small>من ${fmt(avail)} كيلو</small></div></div>
     <div class="bar"><i style="width:${pctL}%"></i></div>
-    <div class="row"><span>💰 اتباع <b>${fmt(t.soldKg)}</b>${t.lossQty ? ` · ⚠️ خسارة <b>${fmt(t.lossQty)}</b>` : ''}</span><span>المتبقي <b class="lft">${fmt(left)}</b> كيلو${avail ? ' · ' + Math.round(pctL) + '%' : ''}</span></div>`;
+    <div class="row"><span>💰 اتباع <b>${fmt(t.soldKg)}</b>${t.lossQty ? ` · ⚠️ خسارة <b>${fmt(t.lossQty)}</b>` : ''}</span><span>${avail ? Math.round(pctL) + '% باقي' : 'لسه مفيش وارد'}</span></div>`;
   $('#todayKpis').innerHTML = kpi('💵 ربح النهارده', money(t.profit), 'big' + (t.profit < 0 ? ' neg' : '')) +
     kpi('💰 المبيعات', money(t.sales)) + kpi('⚖️ اتباع', kg(t.soldKg)) + kpi('🥛 الوارد', kg(t.inQty)) + kpi('🧾 المصاريف', money(t.exp));
   const all = [
