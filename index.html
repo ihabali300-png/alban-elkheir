@@ -137,6 +137,14 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 .cbtn{border:1px dashed var(--acc);background:var(--in);color:var(--acc);border-radius:10px;padding:6px 10px;font-family:inherit;font-weight:800;font-size:13px;display:inline-block}
 .cbtn.done{border-style:solid;color:var(--acc2)}
 .cplus{border:0;background:var(--acc);color:var(--onacc);border-radius:8px;padding:1px 6px;font-family:inherit;font-weight:800;font-size:12px;margin-inline-start:4px}
+.eq{display:flex;align-items:stretch;gap:5px}
+.eqb{flex:1;background:var(--in);border:1px solid var(--bd);border-radius:12px;padding:7px 4px;text-align:center;min-width:0}
+.eqb span{display:block;font-size:10.5px;color:var(--mut);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eqb b{display:block;font-size:22px;font-weight:800;color:var(--txt);line-height:1.2}
+.eqb small{font-size:10.5px;color:var(--mut)}
+.eqb.tot{background:var(--sel);border-color:var(--selb)}.eqb.tot b{color:var(--acc)}
+.sign{flex:none;align-self:center;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:20px;font-weight:800;color:var(--acc);background:var(--bg);box-shadow:inset 2px 2px 4px #0008,inset -1px -1px 2px #fff2}
+.stock .lft{color:var(--acc);font-size:16px}
 .warn{background:#422006;border:1px solid #a16207;color:#fde68a;border-radius:12px;padding:10px;font-size:13px;font-weight:700;margin-bottom:12px}
 #updCard{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:70;max-width:420px;margin:auto;background:var(--bg);border:1px solid #a3e63599;border-radius:16px;padding:14px;box-shadow:0 8px 30px #000c;display:none}
 #updCard.on{display:block}
@@ -387,7 +395,7 @@ th{background:var(--card2);font-weight:800;color:var(--acc2)}
 <div id="toast"></div>
 
 <script>
-const APP_V = 10;
+const APP_V = 11;
 /* ===== أدوات ===== */
 const $ = s => document.querySelector(s);
 const LS = {
@@ -613,6 +621,18 @@ function saveIntake() {
   toast('✅ اتسجل ' + kg(qty) + ' من ' + p.name);
 }
 
+/* باقي امبارح بيترحّل لوحده: باقي أي يوم = وارده + باقي اليوم اللي قبله − المباع − الخسارة */
+function leftOf(src, date, carry) { const t = totals(Object.assign(emptyData(), src), r => r.date === date); return Math.max(0, t.inQty + carry - t.soldKg - t.lossQty); }
+function carryFor(date) {
+  const m = date.slice(0, 7), dd = +date.slice(8);
+  const pm = (() => { const x = new Date(m + '-01T12:00'); x.setMonth(x.getMonth() - 1); return x.toISOString().slice(0, 7); })();
+  const prev = m === st.month ? null : null, pc = LS.get('kh_cache_' + pm, null);
+  let c = 0;
+  if (pc && pc.data) { const n = new Date(+pm.slice(0, 4), +pm.slice(5, 7), 0).getDate(); for (let i = 1; i <= n; i++) c = leftOf(pc.data, pm + '-' + String(i).padStart(2, '0'), c); }
+  const src = m === st.month ? st.data : (LS.get('kh_cache_' + m, null) || {}).data || emptyData();
+  for (let i = 1; i < dd; i++) c = leftOf(src, m + '-' + String(i).padStart(2, '0'), c);
+  return Math.round(c * 100) / 100;
+}
 function carryOver(q) {
   if (!q) return;
   doOp('add', { sheet: 'intake', record: { id: uid(), date: today(), shift: 'صباحي', kind: 'مرحّل', personId: '', name: 'باقي امبارح', product: 'لبن خام', qty: q, price: 0, total: 0, notes: 'مرحّل من امبارح' } });
@@ -770,17 +790,15 @@ const kpi = (l, v, c = '') => `<div class="kpi ${c}"><span>${l}</span><strong>${
 function renderHome() {
   const td = today(), t = totals(st.data, r => r.date === td);
   $('#todayLbl').textContent = dayName(td) + ' ' + td;
-  const avail = t.inQty + t.carry, left = avail - t.soldKg - t.lossQty, pctL = avail ? Math.max(0, Math.min(100, left / avail * 100)) : 0;
-  const yd = (() => { const x = new Date(td + 'T12:00'); x.setDate(x.getDate() - 1); return x.toISOString().slice(0, 10); })();
-  const ysrc = yd.slice(0, 7) === st.month ? st.data : (LS.get('kh_cache_' + yd.slice(0, 7), null) || {}).data;
-  const yt = ysrc ? totals(Object.assign(emptyData(), ysrc), r => r.date === yd) : null, yLeft = yt ? Math.round((yt.inQty + yt.carry - yt.soldKg - yt.lossQty) * 100) / 100 : 0;
-  const carryBtn = t.carry ? `<span class="cbtn done">✅ اترحّل من امبارح ${fmt(t.carry)}</span>` : yLeft > 0 ? `<button class="cbtn" onclick="carryOver(${yLeft})">➕ رحّل باقي امبارح ${fmt(yLeft)} كيلو</button>` : '';
+  const carry = carryFor(td), avail = t.inQty + carry, left = avail - t.soldKg - t.lossQty, pctL = avail ? Math.max(0, Math.min(100, left / avail * 100)) : 0;
   const sp = $('#salePill'); sp.className = 'spill' + (avail && left <= 0 ? ' out' : avail && pctL < 20 ? ' low' : '');
-  sp.innerHTML = `🥛 وارد ${fmt(avail)} · باقي <b>${fmt(left)}</b> كيلو` + (!t.carry && yLeft > 0 ? ` <button class="cplus" title="رحّل باقي امبارح" onclick="carryOver(${yLeft})">+${fmt(yLeft)}</button>` : '');
+  sp.innerHTML = `🥛 إجمالي ${fmt(avail)} · باقي <b>${fmt(left)}</b> كيلو`;
   const sc = $('#stockCard'); sc.className = 'stock' + (avail && left <= 0 ? ' out' : avail && pctL < 20 ? ' low' : '');
-  sc.innerHTML = `<div class="top"><div><span>🥛 المتبقي من وارد النهارده</span><strong>${fmt(left)} <small>كيلو</small></strong></div><div style="text-align:left"><span>الوارد${t.carry ? ' + المرحّل' : ''}</span><strong style="font-size:20px">${fmt(avail)} <small>كيلو</small></strong></div></div>
+  sc.innerHTML = `<div class="eq"><div class="eqb"><span>📥 وارد النهارده</span><b>${fmt(t.inQty)}</b><small>كيلو</small></div><i class="sign">+</i>
+      <div class="eqb"><span>↩️ باقي امبارح</span><b>${fmt(carry)}</b><small>كيلو</small></div><i class="sign">=</i>
+      <div class="eqb tot"><span>🥛 إجمالي اليوم</span><b>${fmt(avail)}</b><small>كيلو</small></div></div>
     <div class="bar"><i style="width:${pctL}%"></i></div>
-    <div class="row"><span>💰 اتباع <b>${fmt(t.soldKg)}</b> كيلو</span>${t.lossQty ? `<span>⚠️ خسارة <b>${fmt(t.lossQty)}</b></span>` : ''}<span>${avail ? Math.round(pctL) + '% باقي' : 'لسه مفيش وارد النهارده'}</span></div>${carryBtn ? `<div style="margin-top:8px">${carryBtn}</div>` : ''}`;
+    <div class="row"><span>💰 اتباع <b>${fmt(t.soldKg)}</b>${t.lossQty ? ` · ⚠️ خسارة <b>${fmt(t.lossQty)}</b>` : ''}</span><span>المتبقي <b class="lft">${fmt(left)}</b> كيلو${avail ? ' · ' + Math.round(pctL) + '%' : ''}</span></div>`;
   $('#todayKpis').innerHTML = kpi('💵 ربح النهارده', money(t.profit), 'big' + (t.profit < 0 ? ' neg' : '')) +
     kpi('💰 المبيعات', money(t.sales)) + kpi('⚖️ اتباع', kg(t.soldKg)) + kpi('🥛 الوارد', kg(t.inQty)) + kpi('🧾 المصاريف', money(t.exp));
   const all = [
